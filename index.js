@@ -27,9 +27,9 @@ async function exec(client, sql, values=[]) {
   });
 }
 
-async function isNotified(client, link) {
+async function isNotified(client, topic) {
   return new Promise((resolve, reject) => {
-    exec(client, 'SELECT COUNT(*) FROM notified WHERE link = $1', [link]).then(res => {
+    exec(client, 'SELECT COUNT(*) FROM notified WHERE topic = $1', [topic]).then(res => {
       if (!res.rows || !res.rows.length) {
         return resolve(false);
       }
@@ -38,12 +38,12 @@ async function isNotified(client, link) {
   });
 }
 
-async function setNotified(client, link) {
-  return exec(client, 'INSERT INTO notified VALUES ($1)', [link]);
+async function setNotified(client, topic) {
+  return exec(client, 'INSERT INTO notified VALUES ($1)', [topic]);
 }
 
 async function checkTable(client) {
-  const query = 'CREATE TABLE IF NOT EXISTS notified (link VARCHAR(1000))';
+  const query = 'CREATE TABLE IF NOT EXISTS notified (topic int)';
   return exec(client, query);
 }
 
@@ -58,10 +58,11 @@ async function checkTable(client) {
   await Promise.all(feed.items.map(async item => {
     const { title, categories, link } = item;
     const category = categories[0];
+    const topic = link.split('?topic=')[1].split('.')[0];
     if (!title.startsWith('Re:')) {
       if (!forums || forums.indexOf(category)) {
-        if (await isNotified(client, link)) {
-          console.log('Already notified -', title);
+        if (await isNotified(client, topic)) {
+          console.log('Already notified -', topic, title);
           return;
         }
 
@@ -75,7 +76,7 @@ async function checkTable(client) {
           json: true,
         };
         await rp(options);
-        return await setNotified(client, link);
+        return await setNotified(client, topic);
       }
     }
   }));
