@@ -47,7 +47,7 @@ async function checkTable(client) {
   return exec(client, query);
 }
 
-(async () => {
+async function run() {
   const client = await connect();
   const feed = await parser.parseURL(process.env.FEED_URL);
   const forums = process.env.FORUMS && process.env.FORUMS.split(',');
@@ -82,5 +82,7 @@ async function checkTable(client) {
   }));
 
   client.end();
+  setTimeout(() => run(), process.env.INTERVAL || 1000);
+};
 
-})();
+run();
