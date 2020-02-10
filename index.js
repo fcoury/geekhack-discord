@@ -71,7 +71,7 @@ async function run() {
           method: 'POST',
           url: webhook,
           body: {
-            content: `@GeekHack Alert ${title} - ${link}`,
+            content: `<@&676468893551951902> ${title} - ${link}`,
           },
           json: true,
         };
