@@ -49,9 +49,7 @@ async function checkTable(client) {
 
 async function run() {
   try {
-    console.log('connecting');
     const client = await connect();
-    console.log('getting feed');
     const feed = await parser.parseURL(process.env.FEED_URL);
     const forums = process.env.FORUMS && process.env.FORUMS.split(',');
     const webhook = process.env.WEBHOOK_URL;
